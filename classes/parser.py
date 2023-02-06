@@ -1,3 +1,5 @@
+from classes.predicate import Predicate
+
 class Parser(object):
     def __init__(self, domain_path, outer_sep, inner_sep):
         self.domain_path = domain_path
@@ -10,5 +12,5 @@ class Parser(object):
             domain = domain.strip().split(self.outer_sep)
 
         predicates = domain[0].split(self.inner_sep)
-        predicates = [(p.split(':')[0], p.split(':')[1]) for p in predicates[1:]]
+        predicates = [Predicate(p.split(':')[0], p.split(':')[1]) for p in predicates[1:]]
         return predicates
