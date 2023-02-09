@@ -9,6 +9,7 @@ class Parser(object):
         self.inner_sep = inner_sep
         self.line_sep = '\n'
         self.predicates = []
+        self.actions = []
 
     def read_predicates(self, domain):
         predicates = domain[0].split(self.line_sep)
@@ -54,13 +55,20 @@ class Parser(object):
 
         return Action(action_name, args, preconditions, add_effects, delete_effects)
 
+    def read_operators(self, domain):
+        actions = domain[1].split(self.inner_sep)
+        actions[0] = self.line_sep.join(actions[0].split(self.line_sep)[1:])
+        actions = [self.parse_action(action_lines) for action_lines in actions]
+        return actions
+
     def parse_domain(self):
         with open(self.domain_path, 'r') as f:
             domain = f.read()
             domain = domain.strip().split(self.outer_sep)
 
         self.predicates = self.read_predicates(domain)
-        return self.parse_predicates(3, domain[1].split(self.line_sep)[5:10])
+        self.actions = self.read_operators()
+        # return self.parse_predicates(3, domain[1].split(self.line_sep)[5:10])
 
 
 if __name__ == '__main__':
