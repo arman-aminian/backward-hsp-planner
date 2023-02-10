@@ -62,6 +62,11 @@ class Parser(object):
     def read_objects(self, objects_lines):
         return [obj.lower() for obj in objects_lines.slit(self.line_sep)[1:]]
 
+    def read_init_state(self, init_state_lines):
+        init_state_lines = init_state_lines.split(self.line_sep)
+        n_predicates = int(init_state_lines[0].split(':')[1])
+        return self.parse_predicates(n_predicates, init_state_lines[1:])
+
     def parse_domain(self):
         with open(self.domain_path, 'r') as f:
             domain = f.read()
