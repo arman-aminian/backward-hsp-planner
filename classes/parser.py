@@ -19,10 +19,7 @@ class Parser(object):
     def parse_predicates(self, n_predicates, predicates_lines):
         idx = 0
         predicates = []
-        print(predicates_lines)
         for i in range(n_predicates):
-            print(idx)
-            print(predicates_lines[idx])
             predicate_name = predicates_lines[idx].lower()
             predicate_n_args = -1
             for pred in self.predicates:
@@ -58,7 +55,7 @@ class Parser(object):
     def read_operators(self, domain):
         actions = domain[1].split(self.inner_sep)
         actions[0] = self.line_sep.join(actions[0].split(self.line_sep)[1:])
-        actions = [self.parse_action(action_lines) for action_lines in actions]
+        actions = [self.parse_action(action_lines.split(self.line_sep)) for action_lines in actions]
         return actions
 
     def parse_domain(self):
@@ -67,7 +64,7 @@ class Parser(object):
             domain = domain.strip().split(self.outer_sep)
 
         self.predicates = self.read_predicates(domain)
-        self.actions = self.read_operators()
+        self.actions = self.read_operators(domain)
         # return self.parse_predicates(3, domain[1].split(self.line_sep)[5:10])
 
 
