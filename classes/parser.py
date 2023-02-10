@@ -67,6 +67,11 @@ class Parser(object):
         n_predicates = int(init_state_lines[0].split(':')[1])
         return self.parse_predicates(n_predicates, init_state_lines[1:])
 
+    def read_goals(self, goals_lines):
+        goals_lines = goals_lines.split(self.line_sep)
+        n_predicates = int(goals_lines[0].split(':')[1])
+        return self.parse_predicates(n_predicates, goals_lines[1:])
+
     def parse_domain(self):
         with open(self.domain_path, 'r') as f:
             domain = f.read()
@@ -83,6 +88,7 @@ class Parser(object):
         problem_segments = problem.split(self.outer_sep)
         objects = self.read_objects(problem_segments[0])
         init_state = self.read_init_state(problem_segments[1])
+        goals = self.read_goals(problem_segments[2])
 
 
 if __name__ == '__main__':
