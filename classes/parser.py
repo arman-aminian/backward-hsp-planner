@@ -63,7 +63,7 @@ class Parser(object):
         return actions
 
     def read_objects(self, objects_lines):
-        return [obj.lower() for obj in objects_lines.slit(self.line_sep)[1:]]
+        return [obj.lower() for obj in objects_lines.split(self.line_sep)[1:]]
 
     def read_init_state(self, init_state_lines):
         init_state_lines = init_state_lines.split(self.line_sep)
@@ -88,10 +88,9 @@ class Parser(object):
             problem = f.read()
             problem = problem.strip().split(self.outer_sep)
 
-        problem_segments = problem.split(self.outer_sep)
-        self.objects = self.read_objects(problem_segments[0])
-        self.init_state = self.read_init_state(problem_segments[1])
-        self.goals = self.read_goals(problem_segments[2])
+        self.objects = self.read_objects(problem[0])
+        self.init_state = self.read_init_state(problem[1])
+        self.goals = self.read_goals(problem[2])
 
 
 if __name__ == '__main__':
