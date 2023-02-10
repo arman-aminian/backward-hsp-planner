@@ -14,4 +14,4 @@ class Predicate(object):
                          args=args)
 
     def __str__(self):
-        return self.name + ":" + str(self.n_args) + ' : ' + ', '.join([arg for arg in self.args])
+        return self.name + '(' + ', '.join([arg for arg in self.args]) + ')'
