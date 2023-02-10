@@ -11,6 +11,9 @@ class Parser(object):
         self.line_sep = '\n'
         self.predicates = []
         self.actions = []
+        self.objects = []
+        self.init_state = []
+        self.goals = []
 
     def read_predicates(self, domain):
         predicates = domain[0].split(self.line_sep)
@@ -86,9 +89,9 @@ class Parser(object):
             problem = problem.strip().split(self.outer_sep)
 
         problem_segments = problem.split(self.outer_sep)
-        objects = self.read_objects(problem_segments[0])
-        init_state = self.read_init_state(problem_segments[1])
-        goals = self.read_goals(problem_segments[2])
+        self.objects = self.read_objects(problem_segments[0])
+        self.init_state = self.read_init_state(problem_segments[1])
+        self.goals = self.read_goals(problem_segments[2])
 
 
 if __name__ == '__main__':
