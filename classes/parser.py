@@ -105,6 +105,10 @@ class Parser(object):
         self.goals = self.read_goals(problem[2])
         self.ground_actions = self.create_ground_actions()
 
+    def parse(self):
+        self.parse_domain()
+        self.parse_problem()
+
 
 if __name__ == '__main__':
     p = Parser('../problems/domain.txt', '\n\n\n', '\n\n')
