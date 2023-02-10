@@ -3,8 +3,9 @@ from classes.action import Action
 
 
 class Parser(object):
-    def __init__(self, domain_path, outer_sep, inner_sep):
+    def __init__(self, domain_path, problem_path, outer_sep, inner_sep):
         self.domain_path = domain_path
+        self.problem_path = problem_path
         self.outer_sep = outer_sep
         self.inner_sep = inner_sep
         self.line_sep = '\n'
@@ -58,6 +59,9 @@ class Parser(object):
         actions = [self.parse_action(action_lines.split(self.line_sep)) for action_lines in actions]
         return actions
 
+    def read_objects(self, objects_lines):
+        return [obj.lower() for obj in objects_lines.slit(self.line_sep)[1:]]
+
     def parse_domain(self):
         with open(self.domain_path, 'r') as f:
             domain = f.read()
@@ -65,7 +69,14 @@ class Parser(object):
 
         self.predicates = self.read_predicates(domain)
         self.actions = self.read_operators(domain)
-        # return self.parse_predicates(3, domain[1].split(self.line_sep)[5:10])
+
+    def parse_problem(self):
+        with open(self.problem_path, 'r') as f:
+            problem = f.read()
+            problem = problem.strip().split(self.outer_sep)
+
+        problem_segments = problem.split(self.outer_sep)
+        objects = self.read_objects(problem_segments[0])
 
 
 if __name__ == '__main__':
