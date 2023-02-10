@@ -19,7 +19,7 @@ class Action(object):
 
     def __str__(self):
         return self.name \
-               + '\nargs:' + self.args \
-               + '\npreconditions:' + self.preconditions \
-               + '\nadd effects:' + self.add_effects \
-               + '\ndelete effects:' + self.delete_effects
+               + '\nargs:' + ',  '.join([str(a) for a in self.args])\
+               + '\npreconditions:' + ',  '.join([str(p) for p in self.preconditions]) \
+               + '\nadd effects:' + ',  '.join([str(e) for e in self.add_effects]) \
+               + '\ndelete effects:' + ',  '.join([str(e) for e in self.delete_effects])
