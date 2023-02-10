@@ -82,6 +82,7 @@ class Parser(object):
 
         problem_segments = problem.split(self.outer_sep)
         objects = self.read_objects(problem_segments[0])
+        init_state = self.read_init_state(problem_segments[1])
 
 
 if __name__ == '__main__':
