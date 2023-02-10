@@ -1,5 +1,6 @@
 from classes.predicate import Predicate
 from classes.action import Action
+import itertools
 
 
 class Parser(object):
@@ -14,6 +15,7 @@ class Parser(object):
         self.objects = []
         self.init_state = []
         self.goals = []
+        self.ground_actions = []
 
     def read_predicates(self, domain):
         predicates = domain[0].split(self.line_sep)
@@ -75,6 +77,16 @@ class Parser(object):
         n_predicates = int(goals_lines[0].split(':')[1])
         return self.parse_predicates(n_predicates, goals_lines[1:])
 
+    def create_ground_actions(self):
+        ground_actions = []
+        for action in self.actions:
+            objects_permutations = list(itertools.permutations(self.objects, len(action.args)))
+            for objects_permutation in objects_permutations:
+                ground_actions.append(action.replace_with_objects(
+                    list(objects_permutation))
+                )
+        return ground_actions
+
     def parse_domain(self):
         with open(self.domain_path, 'r') as f:
             domain = f.read()
@@ -91,6 +103,11 @@ class Parser(object):
         self.objects = self.read_objects(problem[0])
         self.init_state = self.read_init_state(problem[1])
         self.goals = self.read_goals(problem[2])
+        self.ground_actions = self.create_ground_actions()
+
+    def parse(self):
+        self.parse_domain()
+        self.parse_problem()
 
 
 if __name__ == '__main__':
