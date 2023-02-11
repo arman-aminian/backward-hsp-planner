@@ -21,3 +21,10 @@ def get_all_ground_predicates(predicates):
 
 
 key_sort = lambda x: str(x)
+
+
+def is_applicable(init_state, preconditions):
+    for state in preconditions:
+        if state not in init_state:
+            return False
+    return True
