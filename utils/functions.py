@@ -41,9 +41,9 @@ def calculate_delta2(p):
     delta2_init = [sorted(t, key=key_sort) for t in list(itertools.combinations([pre for pre in p.init_state], 2))] + [
         pre for pre in p.init_state]
 
-    ground_predicates = get_all_ground_predicates(p.predicates, p.objeects)
+    ground_predicates = get_all_ground_predicates(p.predicates, p.objects)
     str_ground_predicates = [pre for pre in ground_predicates] + [sorted(t, key=key_sort) for t in (
-        itertools.combinations([pre for pre in ground_predicates], 2))]
+        itertools.combinations(ground_predicates, 2))]
 
     delta2_mapping = {}
     for pre in str_ground_predicates:
@@ -53,7 +53,7 @@ def calculate_delta2(p):
 
     U = set(p.init_state)
 
-    while (True):
+    while True:
         Uprim = set(U)
         for action in p.ground_actions:
             if not is_applicable(Uprim, action.preconditions):
@@ -66,14 +66,13 @@ def calculate_delta2(p):
             itertools.combinations([pre for pre in action.preconditions], 2))]:
                 if delta2_mapping[deep_str(pred)] > max_delta2:
                     max_delta2 = delta2_mapping[deep_str(pred)]
-                    if max_delta2 == 0:
 
             for pred in [pre for pre in action.add_effects] + [sorted(t, key=key_sort) for t in (
             itertools.combinations([pre for pre in action.add_effects], 2))]:
                 delta2_mapping[deep_str(pred)] = min(delta2_mapping[deep_str(pred)], 1 + max_delta2)
 
             for p1 in U - set(action.add_effects):
-                for p2 in set(action.add_effects) - U:
+                for p2 in set(action.add_effects):
                     pair = sorted((p1, p2), key=key_sort)
                     delta2_mapping[deep_str(pair)] = min(delta2_mapping[deep_str(pair)], 1 + max_delta2)
 

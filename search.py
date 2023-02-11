@@ -3,6 +3,11 @@ from classes.parser import Parser
 from classes.action import Action
 from classes.predicate import Predicate
 import random
+import numpy as np
+import itertools
+from utils.functions import calculate_delta2
+from utils.functions import deep_str
+from utils.functions import key_sort
 
 
 def check_relevancy(act: Action, goal_list: list) -> bool:
@@ -34,8 +39,18 @@ def gamma_inverse(act: Action, goals: list) -> list:
     return goals
 
 
-def backward_search(init, goals, actions, trajectory, depth = 0):
-    if depth>4:
+def calc_delta_state(new_goals):
+    all_pairs = list(itertools.combinations(new_goals, 2))
+    maximum = 0
+    for pair in all_pairs:
+        k = delta2_mapping[deep_str(sorted(pair, key=key_sort))]
+        if k > maximum:
+            maximum = k
+    return maximum
+
+
+def backward_search(init, goals, actions, trajectory, depth=0):
+    if depth > 8:
         return False
     cur_goals = goals
     # check if init state satifies cur_goals
@@ -59,27 +74,29 @@ def backward_search(init, goals, actions, trajectory, depth = 0):
     for act in actions:
         if check_relevancy(act, cur_goals):
             relevant_actions.append(act)
+
+    # calculate delta 2 for every state will be reach after applying an action
+    delta_of_states = np.zeros(len(relevant_actions))
+    for ind, act in enumerate(relevant_actions):
+        new_goals = gamma_inverse(act, cur_goals.copy())
+        delta_state = calc_delta_state(new_goals)
+        delta_of_states[ind] = delta_state
+
+    # act_index = np.argmin(delta_of_states)
+    # np.delete(delta_of_states, act_index)
+    # relevant_actions.remove(act)
+
     while len(relevant_actions) > 0:
-        # non-deterministically choose a relevant action
-        act_index = random.randint(0, len(relevant_actions) - 1)
+        act_index = np.argmin(delta_of_states)
+        delta_of_states = np.delete(delta_of_states, act_index)
+
         act = relevant_actions[act_index]
         relevant_actions.remove(act)
         new_goals = gamma_inverse(act, cur_goals.copy())
 
         # check new_goals is superset of old goals
         flag = False
-        #         print('_____________')
-        #         print('old_goal')
-        #         for old_goal in cur_goals:
-        #             print(old_goal)
-        #         print()
-        #         print('action')
-        #         print(act)
 
-        #         print()
-        #         print('new_goal')
-        #         for new_goal in new_goals:
-        #             print(new_goal)
         for old_goal in cur_goals:
             for new_goal in new_goals:
                 if old_goal == new_goal:
@@ -96,7 +113,7 @@ def backward_search(init, goals, actions, trajectory, depth = 0):
             new_trajectory = trajectory.copy()
             new_trajectory.insert(0, act)
 
-            path = backward_search(init, new_goals, actions, new_trajectory, depth+1)
+            path = backward_search(init, new_goals, actions, new_trajectory, depth + 1)
             if not path:
                 continue
             return path
@@ -104,10 +121,12 @@ def backward_search(init, goals, actions, trajectory, depth = 0):
     return False
 
 
-p = Parser('./problems/domain.txt', './problems/simple.txt', OUTER_SEP, INNER_SEP)
+p = Parser('./problems/domain.txt', './problems/reversal4.txt', OUTER_SEP, INNER_SEP)
 p.parse()
 
 trajectory = []
+delta2_mapping = calculate_delta2(p)
+# print(delta2_mapping)
 t = backward_search(p.init_state, p.goals, p.ground_actions, trajectory)
 for act in t:
     print(act)
