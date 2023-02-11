@@ -49,10 +49,12 @@ def calc_delta_state(new_goals):
     return maximum
 
 
-def backward_search(init, goals, actions, trajectory, depth=0):
-    if depth > 6:
+def backward_search(init, goals, actions, trajectory, history, depth=0, max_depth=20):
+    if depth > 8:
         return False
     cur_goals = goals
+
+    history.append(cur_goals)
     # check if init state satifies cur_goals
     flag = False
     for goal in cur_goals:
@@ -85,7 +87,6 @@ def backward_search(init, goals, actions, trajectory, depth=0):
     # act_index = np.argmin(delta_of_states)
     # np.delete(delta_of_states, act_index)
     # relevant_actions.remove(act)
-
     while len(relevant_actions) > 0:
         act_index = np.argmin(delta_of_states)
         delta_of_states = np.delete(delta_of_states, act_index)
@@ -95,38 +96,34 @@ def backward_search(init, goals, actions, trajectory, depth=0):
         new_goals = gamma_inverse(act, cur_goals.copy())
 
         # check new_goals is superset of old goals
-        flag = False
 
-        for old_goal in cur_goals:
-            for new_goal in new_goals:
-                if old_goal == new_goal:
+        for hist_goal in history:
+            flag = False
+            for old_goal in hist_goal:
+                if old_goal not in new_goals:
                     flag = True
                     break
             if not flag:
-                # new goals are superset of old goals and we struggled in a loop, so test the next relevant action
-                flag = True
                 break
-            else:
-                flag = False
-        # if loop did not detected
+
+        # if loop not detected, flag = True
         if flag:
             new_trajectory = trajectory.copy()
             new_trajectory.insert(0, act)
 
-            path = backward_search(init, new_goals, actions, new_trajectory, depth + 1)
+            path = backward_search(init, new_goals, actions, new_trajectory, history, depth + 1)
             if not path:
                 continue
             return path
-
     return False
 
 
-p = Parser('./problems/domain.txt', './problems/simple.txt', OUTER_SEP, INNER_SEP)
+p = Parser('./problems/domain.txt', './problems/twelve-step.txt', OUTER_SEP, INNER_SEP)
 p.parse()
 
 trajectory = []
 delta2_mapping = calculate_delta2(p)
 
-t = backward_search(p.init_state, p.goals, p.ground_actions, trajectory)
+t = backward_search(p.init_state, p.goals, p.ground_actions, trajectory, history=[])
 for i, act in enumerate(t):
     print(str(i) + ': (' + str(act) + ')')
