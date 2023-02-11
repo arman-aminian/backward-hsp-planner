@@ -34,11 +34,14 @@ def gamma_inverse(act: Action, goals: list) -> list:
     return goals
 
 
-def backward_search(init, goals, actions, trajectory):
+def backward_search(init, goals, actions, trajectory, depth = 0):
+    if depth>4:
+        return False
     cur_goals = goals
     # check if init state satifies cur_goals
     flag = False
     for goal in cur_goals:
+        # print('here')
         for pred in init:
             if goal == pred:
                 flag = True
@@ -65,6 +68,18 @@ def backward_search(init, goals, actions, trajectory):
 
         # check new_goals is superset of old goals
         flag = False
+        #         print('_____________')
+        #         print('old_goal')
+        #         for old_goal in cur_goals:
+        #             print(old_goal)
+        #         print()
+        #         print('action')
+        #         print(act)
+
+        #         print()
+        #         print('new_goal')
+        #         for new_goal in new_goals:
+        #             print(new_goal)
         for old_goal in cur_goals:
             for new_goal in new_goals:
                 if old_goal == new_goal:
@@ -72,16 +87,21 @@ def backward_search(init, goals, actions, trajectory):
                     break
             if not flag:
                 # new goals are superset of old goals and we struggled in a loop, so test the next relevant action
+                flag = True
                 break
             else:
                 flag = False
         # if loop did not detected
-        else:
+        if flag:
             new_trajectory = trajectory.copy()
             new_trajectory.insert(0, act)
-            backward_search(init, new_goals, actions, new_trajectory)
-        print('failure. problem is not solvable')
-        return None
+
+            path = backward_search(init, new_goals, actions, new_trajectory, depth+1)
+            if not path:
+                continue
+            return path
+
+    return False
 
 
 p = Parser('./problems/domain.txt', './problems/simple.txt', OUTER_SEP, INNER_SEP)
@@ -89,4 +109,6 @@ p.parse()
 
 trajectory = []
 t = backward_search(p.init_state, p.goals, p.ground_actions, trajectory)
+for act in t:
+    print(act)
 print(t)
