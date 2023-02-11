@@ -8,6 +8,7 @@ import itertools
 from utils.functions import calculate_delta2
 from utils.functions import deep_str
 from utils.functions import key_sort
+import time
 
 
 def check_relevancy(act: Action, goal_list: list) -> bool:
@@ -50,7 +51,7 @@ def calc_delta_state(new_goals):
 
 
 def backward_search(init, goals, actions, trajectory, history, depth=0, max_depth=20):
-    if depth > 8:
+    if depth > max_depth:
         return False
     cur_goals = goals
 
@@ -118,12 +119,22 @@ def backward_search(init, goals, actions, trajectory, history, depth=0, max_dept
     return False
 
 
-p = Parser('./problems/domain.txt', './problems/twelve-step.txt', OUTER_SEP, INNER_SEP)
+def ids(init, goals, actions, trajectory, history, max_depth=20):
+    for d in range(max_depth):
+        res = backward_search(init, goals, actions, trajectory, history, max_depth=d)
+        if res:
+            return res
+    return False
+
+
+p = Parser('./problems/domain.txt', './problems/sussman-anomaly.txt', OUTER_SEP, INNER_SEP)
 p.parse()
 
 trajectory = []
 delta2_mapping = calculate_delta2(p)
 
-t = backward_search(p.init_state, p.goals, p.ground_actions, trajectory, history=[])
+t0 = time.time()
+t = ids(p.init_state, p.goals, p.ground_actions, trajectory, history=[])
+print('time elapsed: ', time.time() - t0)
 for i, act in enumerate(t):
     print(str(i) + ': (' + str(act) + ')')
