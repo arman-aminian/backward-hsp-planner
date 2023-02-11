@@ -50,7 +50,7 @@ def calc_delta_state(new_goals):
 
 
 def backward_search(init, goals, actions, trajectory, depth=0):
-    if depth > 8:
+    if depth > 6:
         return False
     cur_goals = goals
     # check if init state satifies cur_goals
@@ -67,7 +67,7 @@ def backward_search(init, goals, actions, trajectory, depth=0):
         else:
             break
     else:
-        print('problem sloved :))')
+        # print('problem sloved :))')
         return trajectory
 
     relevant_actions = []
@@ -121,13 +121,12 @@ def backward_search(init, goals, actions, trajectory, depth=0):
     return False
 
 
-p = Parser('./problems/domain.txt', './problems/reversal4.txt', OUTER_SEP, INNER_SEP)
+p = Parser('./problems/domain.txt', './problems/simple.txt', OUTER_SEP, INNER_SEP)
 p.parse()
 
 trajectory = []
 delta2_mapping = calculate_delta2(p)
-# print(delta2_mapping)
+
 t = backward_search(p.init_state, p.goals, p.ground_actions, trajectory)
-for act in t:
-    print(act)
-print(t)
+for i, act in enumerate(t):
+    print(str(i) + ': (' + str(act) + ')')
