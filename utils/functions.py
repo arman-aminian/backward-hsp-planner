@@ -18,3 +18,6 @@ def get_all_ground_predicates(predicates):
                 objects_mapping[pre.args[i]] = permutation[i]
 
             ground_predicates.append(pre.replace_with_objects(objects_mapping))
+
+
+key_sort = lambda x: str(x)
