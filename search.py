@@ -80,6 +80,8 @@ def backward_search(init, goals, actions, trajectory):
             new_trajectory = trajectory.copy()
             new_trajectory.insert(0, act)
             backward_search(init, new_goals, actions, new_trajectory)
+        print('failure. problem is not solvable')
+        return None
 
 
 p = Parser('./problems/domain.txt', './problems/simple.txt', OUTER_SEP, INNER_SEP)
