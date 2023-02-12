@@ -112,7 +112,7 @@ def backward_search(init, goals, actions, trajectory, history, depth=0, max_dept
             new_trajectory = trajectory.copy()
             new_trajectory.insert(0, act)
 
-            path = backward_search(init, new_goals, actions, new_trajectory, history, depth + 1)
+            path = backward_search(init, new_goals, actions, new_trajectory, history, depth + 1, max_depth=max_depth)
             if not path:
                 continue
             return path
@@ -127,14 +127,15 @@ def ids(init, goals, actions, trajectory, history, max_depth=20):
     return False
 
 
-p = Parser('./problems/domain.txt', './problems/sussman-anomaly.txt', OUTER_SEP, INNER_SEP)
+p = Parser('./problems/domain.txt', './problems/twelve-step.txt', OUTER_SEP, INNER_SEP)
 p.parse()
 
 trajectory = []
 delta2_mapping = calculate_delta2(p)
 
 t0 = time.time()
-t = ids(p.init_state, p.goals, p.ground_actions, trajectory, history=[])
+# t = ids(p.init_state, p.goals, p.ground_actions, trajectory, history=[])
+t = backward_search(p.init_state, p.goals, p.ground_actions, trajectory, history=[], max_depth=8)
 print('time elapsed: ', time.time() - t0)
 for i, act in enumerate(t):
     print(str(i) + ': (' + str(act) + ')')
